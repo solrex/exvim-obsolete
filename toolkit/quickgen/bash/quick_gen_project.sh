@@ -226,8 +226,8 @@ gen_filenamelist ()
         echo "  |- generate _filenamelist_cwd"
         if test "${dir_filter}" != ""; then
             # NOTE: if we have dir filter, we still need get files in root directory 
-            find ${force_posix_regex_1} . -maxdepth 1 ${force_posix_regex_2} -regex ".*\.("${file_filter}")" > "./${vimfiles_path}/_filenamelist_cwd"
-            find ${force_posix_regex_1} ${dir_filter} ${force_posix_regex_2} -regex ".*\.("${file_filter}")" >> "./${vimfiles_path}/_filenamelist_cwd"
+            local _dir_filter=$(echo $dir_filter | tr ' ' '|')
+            find ${force_posix_regex_1} . ${force_posix_regex_2} -regex ".*\.("${file_filter}")" | egrep -v "$_dir_filter" > "./${vimfiles_path}/_filenamelist_cwd"
         else
             find ${force_posix_regex_1} . ${force_posix_regex_2} -regex ".*\.("${file_filter}")" > "./${vimfiles_path}/_filenamelist_cwd"
         fi
@@ -365,17 +365,17 @@ gen_id ()
     # if we have manual configure id language map, we use it as highest priority
     if [ -f "./${vimfiles_path}/id-lang-custom.map" ]; then
         echo "  |- generate ID by custom language map"
-        mkid --include="text" --lang-map="./${vimfiles_path}/id-lang-custom.map" ${dir_filter}
+        mkid --include="text" --lang-map="./${vimfiles_path}/id-lang-custom.map"
 
         # if not, we try to use auto-gen id language map as second option
     elif [ -f "./${vimfiles_path}/id-lang-autogen.map" ]; then
         echo "  |- generate ID by auto-gen language map"
-        mkid --include="text" --lang-map="./${vimfiles_path}/id-lang-autogen.map" ${dir_filter}
+        mkid --include="text" --lang-map="./${vimfiles_path}/id-lang-autogen.map"
 
         # if both file not exists, we use default one in toolkit directory
     else
         echo "  |- generate ID by default language map"
-        mkid --include="text" --lang-map="${toolkit_path}/idutils/id-lang.map" ${dir_filter}
+        mkid --include="text" --lang-map="${toolkit_path}/idutils/id-lang.map"
     fi
 
     # mkid --include="C C++"

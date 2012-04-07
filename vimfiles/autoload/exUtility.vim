@@ -1625,7 +1625,7 @@ function exUtility#GetProjectDirFilterCommand() " <<<
         endfor
     elseif has ('unix')
         for item in filter_list 
-            let filter_command .= '"./' . item . '" '
+            let filter_command .= '"' . item . '/" '
         endfor
     endif
 
@@ -1878,7 +1878,7 @@ function exUtility#Browse(dir, file_filter, dir_filter, filename_list ) " <<<
                 endif
                 let list_idx -= 1
             elseif a:dir_filter != '' " remove not fit dirs
-                if match( file_list[list_idx], a:dir_filter ) == -1 " if not found dir name in dir filter
+                if match( file_list[list_idx], a:dir_filter ) != -1 " if not found dir name in dir filter
                     silent call remove(file_list,list_idx)
                     let list_idx -= 1
                 endif
@@ -1905,7 +1905,7 @@ function exUtility#Browse(dir, file_filter, dir_filter, filename_list ) " <<<
             if list_idx != list_last
                 let s:ex_level_list[len(s:ex_level_list)-1].is_last = 0
             endif
-            if exUtility#Browse(file_list[list_idx],a:file_filter,'',a:filename_list) == 1 " if it is empty
+            if exUtility#Browse(file_list[list_idx],a:file_filter,a:dir_filter,a:filename_list) == 1 " if it is empty
                 silent call remove(file_list,list_idx)
                 let list_last = len(file_list)-1
             endif
@@ -2935,7 +2935,7 @@ function exUtility#CreateQuickGenProject() " <<<
     if exists('g:exES_VimEntryName')
         let vimentry_name = '_' . g:exES_VimEntryName
     endif
-    let file_name = 'quick_gen_project' . vimentry_name . '_autogen.' . script_suffix
+    let file_name = g:exES_vimfiles_dirname . '/quick_gen_project' . vimentry_name . '_autogen.' . script_suffix
     call writefile ( text_list, file_name )
 
     " write pre and post file
